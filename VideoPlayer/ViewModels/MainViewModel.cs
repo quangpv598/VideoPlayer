@@ -1,28 +1,40 @@
-﻿using FlyleafLib.MediaPlayer;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using FlyleafLib.Controls.WPF;
+using FlyleafLib.MediaPlayer;
 using FlyleafLib;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.ComponentModel;
-using System.Windows;
 using System.Windows.Input;
-using FlyleafLib.Controls.WPF;
-using System.Windows.Media;
+using System.Xml.Linq;
 
-namespace VideoPlayer
+namespace VideoPlayer.ViewModels
 {
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public class MainViewModel : ObservableObject
     {
         public Player Player { get; set; }
         public Config Config { get; set; }
 
-        public string LastError { get => _LastError; set { if (_LastError == value) return; _LastError = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LastError))); } }
-        string _LastError;
+        private string _lastError;
+        public string LastError
+        {
+            get => _lastError;
+            set => SetProperty(ref _lastError, value);
+        }
 
-        public bool ShowDebug { get => _ShowDebug; set { if (_ShowDebug == value) return; _ShowDebug = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShowDebug))); } }
-        bool _ShowDebug;
+        private bool _showDebug;
+        public bool ShowDebug
+        {
+            get => _showDebug;
+            set => SetProperty(ref _showDebug, value);
+        }
 
         public ICommand ToggleDebug { get; set; }
 
-        public MainWindow()
+        public MainViewModel()
         {
             // Initializes Engine (Specifies FFmpeg libraries path which is required)
             Engine.Start(new EngineConfig()
@@ -44,8 +56,6 @@ namespace VideoPlayer
 
             ToggleDebug = new RelayCommandSimple(new Action(() => { ShowDebug = !ShowDebug; }));
 
-            InitializeComponent();
-
             Config = new Config();
 
             // Inform the lib to refresh stats
@@ -53,13 +63,9 @@ namespace VideoPlayer
 
             Player = new Player(Config);
 
-            DataContext = this;
-
             // Keep track of error messages
             Player.OpenCompleted += (o, e) => { LastError = e.Error; };
             Player.BufferingCompleted += (o, e) => { LastError = e.Error; };
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
