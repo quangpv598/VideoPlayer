@@ -1,0 +1,63 @@
+﻿<Window
+    x:Class="VideoPlayer.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:fl="clr-namespace:FlyleafLib.Controls.WPF;assembly=FlyleafLib"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="MainWindow"
+    Width="800"
+    Height="450"
+    mc:Ignorable="d">
+    <Grid>
+        <fl:FlyleafHost KeyBindings="Surface" Player="{Binding Player}">
+            <Grid Margin="50" DataContext="{Binding HostDataContext}">
+
+                <!--  NOTE: Window resources will not be within the videoview as it will be on different window  -->
+                <Grid.Resources>
+                    <ResourceDictionary>
+                        <Style TargetType="{x:Type fl:PlayerDebug}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowDebug}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ResourceDictionary>
+                </Grid.Resources>
+
+                <!--  Keep track of error messages  -->
+                <TextBlock
+                    Margin="-40"
+                    FontSize="20"
+                    Foreground="Red"
+                    Text="{Binding LastError}" />
+
+                <StackPanel
+                    Width="450"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom">
+
+                    <Button Command="{Binding Player.Commands.OpenFromFileDialog}" Content="OpenFromFileDialog" />
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button Command="{Binding Player.Commands.Play}" Content="Play" />
+                        <Button Command="{Binding Player.Commands.Pause}" Content="Pause" />
+                        <Button Command="{Binding Player.Commands.Stop}" Content="Stop" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                    <Slider
+                        Width="400"
+                        IsMoveToPointEnabled="True"
+                        LargeChange="{Binding Player.Config.Player.SeekOffset2}"
+                        Maximum="{Binding Player.Duration}"
+                        SmallChange="{Binding Player.Config.Player.SeekOffset}"
+                        Value="{Binding Player.CurTime}" />
+                </StackPanel>
+            </Grid>
+        </fl:FlyleafHost>
+    </Grid>
+</Window>
